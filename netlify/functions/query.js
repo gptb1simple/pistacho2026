@@ -26,9 +26,29 @@ exports.handler = async (event) => {
         cookieHeaders: cookieHeaders || ''
       })
     });
+    
 
-    const data = await res.json();
-    return { statusCode: 200, body: JSON.stringify(data) };
+const data = await res.json();
+
+let texto = '';
+
+try {
+
+  if (typeof data.respuesta === 'string') {
+    const parsed = JSON.parse(data.respuesta);
+    texto = parsed.mensaje_bot || data.respuesta;
+  } else {
+    texto = data.respuesta?.mensaje_bot || '';
+  }
+
+} catch (e) {
+  texto = data.respuesta || 'No pude generar respuesta.';
+}
+
+return {
+  statusCode: 200,
+  body: JSON.stringify({ respuesta: texto })
+};
   } catch (e) {
     return { statusCode: 500, body: JSON.stringify({ error: 'make_error' }) };
   }
