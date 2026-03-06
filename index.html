@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pistacho — Inteligencia para tu ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pistacho.css">
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo-icon">🌿</div>
+      <h1>Pista<span>cho</span></h1>
+      <p>Tu analista inteligente para SAP Business One</p>
+    </div>
+    <div id="step-1">
+      <div class="login-field">
+        <label>ID de acceso</label>
+        <input type="text" id="login-id" placeholder="Ej: OSL-2024" autocomplete="off">
+      </div>
+      <button class="login-btn" id="step1-btn" onclick="buscarBases()">Continuar →</button>
+      <div class="login-error" id="login-error-1"></div>
+      <div class="login-footer">Demo: ID <strong>DEMO</strong></div>
+    </div>
+    <div id="step-2" style="display:none">
+      <div class="step-back" onclick="volverPaso1()">← Cambiar ID</div>
+      <div class="login-field">
+        <label>Base de datos</label>
+        <select id="login-company"></select>
+      </div>
+      <div class="login-field">
+        <label>Usuario SAP</label>
+        <input type="text" id="login-user" placeholder="manager" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">Ingresar a Pistacho →</button>
+      <div class="login-error" id="login-error-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    <div class="logo-text">Pista<span>cho</span></div>
+  </div>
+  <div class="header-meta">
+    <div class="company-badge" id="company-badge">—</div>
+    <div class="status-dot"><div class="dot"></div><span>Conectado a SAP</span></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Ventas</div>
+      <button class="quick-btn" onclick="sendQuick('¿Cómo vienen las ventas este año?')"><span class="q-icon">📈</span>Evolución de ventas</button>
+      <button class="quick-btn" onclick="sendQuick('Top 5 clientes por facturación')"><span class="q-icon">🏆</span>Top 5 clientes</button>
+      <button class="quick-btn" onclick="sendQuick('¿Cuál es el artículo más vendido?')"><span class="q-icon">⭐</span>Artículo más vendido</button>
+      <button class="quick-btn" onclick="sendQuick('Ventas por vendedor este año')"><span class="q-icon">👤</span>Ranking de vendedores</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Compras</div>
+      <button class="quick-btn" onclick="sendQuick('Top proveedores por compras')"><span class="q-icon">🏭</span>Top proveedores</button>
+      <button class="quick-btn" onclick="sendQuick('¿Qué proveedor tiene mayor saldo pendiente?')"><span class="q-icon">⏳</span>Mayor pendiente</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Inventario</div>
+      <button class="quick-btn" onclick="sendQuick('¿Qué artículos tienen más stock disponible?')"><span class="q-icon">📦</span>Stock disponible</button>
+      <button class="quick-btn" onclick="sendQuick('¿Cuántos artículos activos tengo?')"><span class="q-icon">🔢</span>Total de artículos</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="context-card">
+      <div class="context-row"><span class="context-key">ID</span><span class="context-val" id="ctx-id">—</span></div>
+      <div class="context-row"><span class="context-key">USUARIO</span><span class="context-val" id="ctx-user">—</span></div>
+      <div class="context-row"><span class="context-key">BASE</span><span class="context-val" id="ctx-db">—</span></div>
+      <div class="context-row"><span class="context-key">SESIÓN</span><span class="context-val" id="ctx-session">—</span></div>
+      <div class="context-row"><span class="context-key">CONSULTAS</span><span class="context-val" id="ctx-queries">0</span></div>
+    </div>
+  </div>
+
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome-msg">
+        <span class="welcome-icon">🌿</span>
+        <h2>Hola, soy Pistacho</h2>
+        <p>Tu analista inteligente conectado a SAP Business One. Preguntame lo que necesites sobre ventas, compras, inventario o finanzas.</p>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea id="chat-input" placeholder="¿Cómo vienen las ventas este trimestre?" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="input-hint">Enter para enviar · Shift+Enter para nueva línea</div>
+    </div>
+  </div>
+</div>
+
+<script src="pistacho.js"></script>
+</body>
+</html>
