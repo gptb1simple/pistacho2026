@@ -26,13 +26,17 @@ exports.handler = async (event) => {
       })
     });
 
-    const data = await res.json();
+    const rawText = await res.text();
 
-    // Make devuelve { "respuesta": "texto plano de OpenAI" }
-    // No parsear — tomarlo directo
-    const texto = (typeof data.respuesta === 'string' && data.respuesta.trim())
-      ? data.respuesta.trim()
-      : 'No pude generar una respuesta.';
+    let texto = '';
+    try {
+      const data = JSON.parse(rawText);
+      texto = typeof data.respuesta === 'string' ? data.respuesta.trim() : '';
+    } catch(e) {
+      texto = rawText.trim();
+    }
+
+    if (!texto) texto = 'No pude generar una respuesta.';
 
     return {
       statusCode: 200,
@@ -42,7 +46,7 @@ exports.handler = async (event) => {
   } catch(e) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'make_error' })
+      body: JSON.stringify({ error: 'make_error', detalle: e.message })
     };
   }
 };
