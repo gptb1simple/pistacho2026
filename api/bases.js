@@ -3,7 +3,8 @@ const crypto = require('crypto');
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const { id_cliente } = req.body || {};
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+  const { id_cliente } = body;
   if (!id_cliente) return res.status(400).json({ error: 'bad_request' });
 
   const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
