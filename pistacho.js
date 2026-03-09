@@ -45,7 +45,7 @@ async function fetchWithTimeout(url, options, timeout = 30000) {
 // ── RENOVAR COOKIE SAP ──
 async function renovarCookie() {
   try {
-    const res  = await fetchWithTimeout('/.netlify/functions/login', {
+    const res  = await fetchWithTimeout('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: company, username: user, password: pass })
@@ -85,7 +85,7 @@ async function buscarBases() {
   btn.disabled = true; btn.textContent = 'Buscando...';
 
   try {
-    const res  = await fetchWithTimeout('/.netlify/functions/bases', {
+    const res  = await fetchWithTimeout('/api/bases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_cliente: idCliente })
@@ -129,7 +129,7 @@ async function doLogin() {
   btn.disabled = true; btn.textContent = 'Conectando con SAP...';
 
   try {
-    const res  = await fetchWithTimeout('/.netlify/functions/login', {
+    const res  = await fetchWithTimeout('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: company })
@@ -243,7 +243,7 @@ async function callPistacho(userText) {
   };
 
   try {
-    let res  = await fetchWithTimeout('/.netlify/functions/query', {
+    let res  = await fetchWithTimeout('/api/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -255,7 +255,7 @@ async function callPistacho(userText) {
       const renovado = await renovarCookie();
       if (renovado) {
         payload.cookieHeaders = sessionCookie;
-        res  = await fetchWithTimeout('/.netlify/functions/query', {
+        res  = await fetchWithTimeout('/api/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
