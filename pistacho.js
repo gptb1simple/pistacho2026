@@ -48,7 +48,7 @@ async function renovarCookie() {
     const res  = await fetchWithTimeout('/.netlify/functions/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: sessionCompany })
+      body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: company, username: user, password: pass })
     });
     const data = await res.json();
     if (data.autorizado === true) {
