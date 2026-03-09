@@ -25,9 +25,13 @@ exports.handler = async (event) => {
     if (!url_sap) return { statusCode: 500, body: JSON.stringify({ error: 'url_sap_missing' }) };
 
     // 2. Login directo en SAP con usuario y contraseña del cliente
+    const https = require('https');
+    const agent = new https.Agent({ rejectUnauthorized: false });
+  
     const sapRes = await fetch(`${url_sap}/Login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+    agent,
       body: JSON.stringify({
         UserName:  username,
         Password:  password,
