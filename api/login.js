@@ -4,7 +4,8 @@ const https  = require('https');
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const { id_cliente, companydb, username, password } = req.body || {};
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+  const { id_cliente, companydb, username, password } = body;
   if (!id_cliente || !companydb || !username || !password)
     return res.status(400).json({ error: 'bad_request' });
 
