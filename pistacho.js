@@ -132,7 +132,7 @@ async function doLogin() {
     const res  = await fetchWithTimeout('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: company })
+      body: JSON.stringify({ id_cliente: sessionIdCliente, companydb: company, username: user, password: pass })
     });
     const data = await res.json();
 
