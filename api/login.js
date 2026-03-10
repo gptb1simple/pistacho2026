@@ -32,6 +32,6 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: makeData.error || 'credenciales_invalidas' });
     }
   } catch (e) {
-    return res.status(500).json({ error: 'server_error', detalle: e.message });
+    return res.status(500).json({ error: 'credenciales_invalidas', detalle: e.message });
   }
 }
