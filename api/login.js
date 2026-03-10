@@ -4,10 +4,20 @@ const https  = require('https');
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+  let body = {};
+  try {
+    body = typeof req.body === 'object' ? req.body : JSON.parse(req.body);
+  } catch(e) {
+    return res.status(400).json({ error: 'invalid_json' });
+  }
+
   const { id_cliente, companydb, username, password } = body;
+
   if (!id_cliente || !companydb || !username || !password)
-    return res.status(400).json({ error: 'bad_request' });
+    return res.status(400).json({ 
+      error: 'bad_request',
+      debug: { id_cliente: !!id_cliente, companydb: !!companydb, username: !!username, password: !!password }
+    });
 
   const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
   const APPS_SECRET     = process.env.APPS_SECRET;
