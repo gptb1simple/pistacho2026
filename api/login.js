@@ -30,14 +30,14 @@ export default async function handler(req, res) {
     const appsData = await appsRes.json();
 
     if (!appsData.url_sap) {
-      return res.status(401).json({ error: `DEBUG: Apps Script no devolvió url_sap. Respuesta: ${JSON.stringify(appsData)}` });
+      return res.status(401).json({ error: 'cliente_no_encontrado' });
     }
 
-    const url_sap    = appsData.url_sap.replace(/\/$/, '');
-    const loginUrl   = `${url_sap}/b1s/v1/Login`;
+    // url_sap ya incluye /b1s/v1 en el Apps Script
+    const url_sap = appsData.url_sap.replace(/\/$/, '');
 
     // Paso 2: login directo a SAP Business One Service Layer
-    const sapRes  = await fetch(loginUrl, {
+    const sapRes = await fetch(`${url_sap}/Login`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ UserName: username, Password: password, CompanyDB: companydb })
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(401).json({ error: `DEBUG SAP [${sapRes.status}] url:${loginUrl} resp:${sapRawText.slice(0, 300)}` });
+    return res.status(401).json({ error: 'Credenciales inválidas en SAP.' });
 
   } catch (e) {
     return res.status(500).json({ error: 'sap_connection_error', detalle: e.message });
