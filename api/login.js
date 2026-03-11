@@ -30,29 +30,32 @@ export default async function handler(req, res) {
     const appsData = await appsRes.json();
 
     if (!appsData.url_sap) {
-      return res.status(401).json({ error: 'cliente_no_encontrado' });
+      return res.status(401).json({ error: `DEBUG: Apps Script no devolvió url_sap. Respuesta: ${JSON.stringify(appsData)}` });
     }
 
-    const url_sap = appsData.url_sap.replace(/\/$/, '');
+    const url_sap    = appsData.url_sap.replace(/\/$/, '');
+    const loginUrl   = `${url_sap}/b1s/v1/Login`;
 
     // Paso 2: login directo a SAP Business One Service Layer
-    const sapRes  = await fetch(`${url_sap}/b1s/v1/Login`, {
+    const sapRes  = await fetch(loginUrl, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ UserName: username, Password: password, CompanyDB: companydb })
     });
 
+    const sapRawText = await sapRes.text();
+
     if (sapRes.ok) {
-      // Extraer sesión del Set-Cookie header (más robusto entre versiones de SAP)
       const setCookie    = sapRes.headers.get('set-cookie') || '';
       const sessionMatch = setCookie.match(/B1SESSION=([^;]+)/);
       const routeMatch   = setCookie.match(/ROUTEID=([^;]+)/);
 
-      // Fallback: algunos SAP devuelven el SessionId en el body JSON
       let sessionId = sessionMatch?.[1];
       if (!sessionId) {
-        const sapData = await sapRes.json();
-        sessionId = sapData.SessionId || '';
+        try {
+          const sapData = JSON.parse(sapRawText);
+          sessionId = sapData.SessionId || '';
+        } catch(e) {}
       }
 
       if (sessionId) {
@@ -65,7 +68,7 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(401).json({ error: 'Credenciales inválidas en SAP.' });
+    return res.status(401).json({ error: `DEBUG SAP [${sapRes.status}] url:${loginUrl} resp:${sapRawText.slice(0, 300)}` });
 
   } catch (e) {
     return res.status(500).json({ error: 'sap_connection_error', detalle: e.message });
