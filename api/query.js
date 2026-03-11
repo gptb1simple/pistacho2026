@@ -122,20 +122,24 @@ export default async function handler(req, res) {
 
     while (calls < MAX_CALLS) {
       const result = await callOpenAI(OPENAI_API_KEY, MODEL, messages, SAP_TOOLS);
-      const choice = result.choices?.[0];
+
+      // DEBUG: si OpenAI falla
+      if (!result.choices) {
+        return res.status(200).json({ respuesta: `DEBUG OpenAI error: ${JSON.stringify(result)}` });
+      }
+
+      const choice = result.choices[0];
       if (!choice) break;
 
       messages.push(choice.message);
 
-      // Sin tool call → GPT terminó, devolver respuesta
       if (!choice.message.tool_calls?.length) {
         return res.status(200).json({ respuesta: choice.message.content || 'No pude generar una respuesta.' });
       }
 
-      // Ejecutar todas las tool calls de este turno (puede ser más de una)
       for (const toolCall of choice.message.tool_calls) {
-        const args    = JSON.parse(toolCall.function.arguments);
-        const sapUrl  = `${url_sap}${args.endpoint}${args.params ? '?' + args.params : ''}`;
+        const args   = JSON.parse(toolCall.function.arguments);
+        const sapUrl = `${url_sap}${args.endpoint}${args.params ? '?' + args.params : ''}`;
 
         const sapRes = await fetch(sapUrl, {
           method:  'GET',
@@ -151,6 +155,10 @@ export default async function handler(req, res) {
           const sapData = await sapRes.json();
           const records = sapData.value ?? sapData;
           content = JSON.stringify(records).slice(0, 10000);
+        } else {
+          // DEBUG: mostrar error SAP
+          const errText = await sapRes.text();
+          content = `DEBUG SAP [${sapRes.status}] url:${sapUrl} resp:${errText.slice(0, 300)}`;
         }
 
         messages.push({ role: 'tool', tool_call_id: toolCall.id, content });
@@ -159,7 +167,6 @@ export default async function handler(req, res) {
       calls++;
     }
 
-    // Si se agotaron los intentos sin respuesta final
     return res.status(200).json({ respuesta: 'No pude generar una respuesta. Intentá de nuevo.' });
 
   } catch (e) {
