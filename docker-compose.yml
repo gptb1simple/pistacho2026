@@ -1,0 +1,14 @@
+services:
+  pistacho-api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - APPS_SCRIPT_URL=${APPS_SCRIPT_URL}
+      - APPS_SECRET=${APPS_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - STATIC_FILES_PATH=/app/wwwroot
+    volumes:
+      - ./frontend:/app/wwwroot:ro
+    restart: unless-stopped
