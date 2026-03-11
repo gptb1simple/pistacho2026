@@ -122,13 +122,7 @@ export default async function handler(req, res) {
 
     while (calls < MAX_CALLS) {
       const result = await callOpenAI(OPENAI_API_KEY, MODEL, messages, SAP_TOOLS);
-
-      // DEBUG: si OpenAI falla
-      if (!result.choices) {
-        return res.status(200).json({ respuesta: `DEBUG OpenAI error: ${JSON.stringify(result)}` });
-      }
-
-      const choice = result.choices[0];
+      const choice = result.choices?.[0];
       if (!choice) break;
 
       messages.push(choice.message);
@@ -155,10 +149,6 @@ export default async function handler(req, res) {
           const sapData = await sapRes.json();
           const records = sapData.value ?? sapData;
           content = JSON.stringify(records).slice(0, 10000);
-        } else {
-          // DEBUG: mostrar error SAP
-          const errText = await sapRes.text();
-          content = `DEBUG SAP [${sapRes.status}] url:${sapUrl} resp:${errText.slice(0, 300)}`;
         }
 
         messages.push({ role: 'tool', tool_call_id: toolCall.id, content });
